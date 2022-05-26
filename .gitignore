@@ -7,3 +7,4 @@ OLD_*
 models/
 data/
 youtube_LSTM_demo/
+__pycache__/
