@@ -7,10 +7,15 @@ from scapy.all import sniff, IP
 import numpy as np
 from matplotlib import pyplot as plt
 from datetime import datetime as dt
+import tensorflow as tf
 
 TIME_FRAME = 20
 CLIENT = "10.249.147.245"
 IFACE = "en0"
+
+model = tf.keras.models.load_model('models/convlstm_model_Datetime_2022_05_26__23_52_24__loss_0.08553284406661987_acc_0.9906666874885559.h5')
+
+print(model.summary())
 
 ## Define our Custom Action function
 def custom_action(packet):
@@ -19,7 +24,6 @@ def custom_action(packet):
         length = packet[IP].len
         dir = (lambda x: 0 if x[IP].src == CLIENT else 1)(packet)
         matrix[int(time_round * 10)-1][int(length / 10)-1][dir] += 1
-
 
 
 start_time = dt.now().timestamp()
