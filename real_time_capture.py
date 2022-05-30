@@ -6,11 +6,15 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+
+
 from scapy.all import sniff, IP
 import multiprocessing
+import threading
 import numpy as np
 from matplotlib import pyplot as plt
 from datetime import datetime as dt
+import time
 import tensorflow as tf
 
 
@@ -46,9 +50,17 @@ def plot_matrix(matrix):
 
 def main():
     while True:
+        t1 = time.perf_counter()
         matrix = gen_matrix()
+        t2 = time.perf_counter()
+        print(f"Time taken for capture: {t2 - t1}")
         p2 = multiprocessing.Process(target=predict, args=[matrix])
+        p2 = threading.Thread(target=predict, args=[matrix])
         p2.start()
+        t3 = time.perf_counter()
+        print(f"Time taken for process start: {t3 - t2}")
+        print(f"Time taken for loop: {t3 - t1}")
+        
 
 
 

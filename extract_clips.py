@@ -1,4 +1,4 @@
-#!/Users/michaelkearney/.local/share/virtualenvs/UNB_Datasets-qeLdalLc/bin/python3
+#!/usr/bin/env python3
 
 # Used to extract 20 clips of streams from larger dataset. Inputs directory of mixed pcaps and outputs labeled 20 clips suitable for the input to extract_arrays.ipynb.
 
