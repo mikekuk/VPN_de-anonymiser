@@ -2,6 +2,8 @@
 
 # Work in progress. Currently visualise 20 sec capture. Will go on to make predictions onn rolling 20 sec capture.
 
+
+# Suppress excess logging to terminal.
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import logging
@@ -18,10 +20,10 @@ import time
 import tensorflow as tf
 
 
-TIME_FRAME = 20
+TIME_FRAME = 10
 CLIENT = "10.249.147.245"
 IFACE = "en0"
-OFFSET = 0
+OFFSET = 5
 
 model = tf.keras.models.load_model('models/convlstm_model_Datetime_2022_05_26__23_52_24__loss_0.08553284406661987_acc_0.9906666874885559.h5')
 
@@ -35,7 +37,7 @@ def gen_matrix():
             matrix[int(time_round * 10)-1][int(length / 10)-1][dir] += 1
 
     start_time = dt.now().timestamp()
-    matrix = np.zeros([TIME_FRAME * 10, 150, 2])
+    matrix = np.zeros([200, 150, 2])
     sniff(filter="ip", prn=add_pkt, timeout=int(TIME_FRAME), iface=IFACE)
     return np.array([matrix])
 

@@ -5,7 +5,6 @@ MaliciousDoH-dns2tcp-Pcap-001_600/
 SCX-VPN-NonVPN-2016/
 *.html
 OLD_*
-models/
 data/
 youtube_LSTM_demo/
 __pycache__/
