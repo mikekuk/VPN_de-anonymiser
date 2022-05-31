@@ -11,7 +11,7 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
 
 from scapy.all import sniff, IP
-import multiprocessing
+# import multiprocessing
 import threading
 import numpy as np
 from matplotlib import pyplot as plt
@@ -56,7 +56,7 @@ def main():
         matrix = gen_matrix()
         t2 = time.perf_counter()
         print(f"Time taken for capture: {t2 - t1}")
-        p2 = multiprocessing.Process(target=predict, args=[matrix])
+        # p2 = multiprocessing.Process(target=predict, args=[matrix])
         p2 = threading.Thread(target=predict, args=[matrix])
         p2.start()
         t3 = time.perf_counter()
