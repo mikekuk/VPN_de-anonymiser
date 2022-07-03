@@ -27,6 +27,19 @@ OFFSET = 5
 
 model = tf.keras.models.load_model('models/convlstm_model_Datetime_2022_05_26__23_52_24__loss_0.08553284406661987_acc_0.9906666874885559.h5')
 
+SITES = [
+    "www.google.com",
+    "www.youtube.com",
+    "www.facebook.com",
+    "www.bbc.co.uk",
+    "www.twitter.com",
+    "www.amazon.co.uk",
+    "www.google.co.uk",
+    "www.wikipedia.com",
+    "www.ebay.co.uk",
+    "www.uwe.ac.uk"
+]
+
 def gen_matrix():
 
     def add_pkt(packet):
@@ -43,7 +56,10 @@ def gen_matrix():
 
 def predict(matrix):
     predictions = model.predict(matrix)
-    print(predictions)
+    print("\n\n")
+    for i in range(len(SITES)):
+        print(f"{SITES[i]} - {round(predictions[0][i], 2)}")
+    print("\n\n")
 
 def plot_matrix(matrix):
     plt.imshow(np.pad(matrix[0], (0,1)), aspect="auto")
@@ -51,7 +67,8 @@ def plot_matrix(matrix):
 
 
 def main():
-    while True:
+    count = 5
+    while count > 0:
         t1 = time.perf_counter()
         matrix = gen_matrix()
         t2 = time.perf_counter()
@@ -62,6 +79,7 @@ def main():
         t3 = time.perf_counter()
         print(f"Time taken for process start: {t3 - t2}")
         print(f"Time taken for loop: {t3 - t1}")
+        count -= 1
         
 
 
