@@ -23,6 +23,7 @@ THe client gen_data.py is trigger to run every minute form crontab with the foll
 
 For this to work as intended, the selenium drivers need to be installed. This can be downloaded form https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/
 
+The client will save all pcaps to the shared pcap_data directory.
 
 If required, extract_clips.py is used to exctact sessions and 20 second clips from larger pcaps. This is set to work with the ISCX VPN-No nVPN dateset.
 
@@ -30,8 +31,10 @@ extract_arrays.ipynb is used to extract and save numpy arrays of the correct sha
 
 data_visulise.ipynb is sued to visualise the extracted arrays.
 
-
 ml_test.ipynb is used to train and save the models. 
 
+predict.ipynb is used to evaluate the model with subsequent datasets.
 
-Crontab entry for client VM:
+real_time_capture.py in VPN_router-scrips is used to make realtime predictions of what what the clent is doing from the router. 
+
+functions.py contains helper function that are used for other scripts. 
