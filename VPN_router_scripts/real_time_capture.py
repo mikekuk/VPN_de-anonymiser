@@ -24,20 +24,21 @@ TIME_FRAME = 10
 CLIENT = "10.249.147.245"
 IFACE = "en0"
 OFFSET = 5
+SCALER_MAX = 709.0  # Max values observed during training
 
 model = tf.keras.models.load_model('models/convlstm_model_Datetime_2022_05_26__23_52_24__loss_0.08553284406661987_acc_0.9906666874885559.h5')
 
 SITES = [
-    "www.google.com",
-    "www.youtube.com",
-    "www.facebook.com",
-    "www.bbc.co.uk",
-    "www.twitter.com",
     "www.amazon.co.uk",
-    "www.google.co.uk",
-    "www.wikipedia.com",
+    "www.bbc.co.uk",
     "www.ebay.co.uk",
-    "www.uwe.ac.uk"
+    "www.facebook.com",
+    "www.google.co.uk",
+    "www.google.com",
+    "www.twitter.com",
+    "www.uwe.ac.uk",
+    "www.wikipedia.com",
+    "www.youtube.com"
 ]
 
 def gen_matrix():
@@ -55,7 +56,7 @@ def gen_matrix():
     return np.array([matrix])
 
 def predict(matrix):
-    predictions = model.predict(matrix)
+    predictions = model.predict(matrix/SCALER_MAX)
     print("\n\n")
     for i in range(len(SITES)):
         print(f"{SITES[i]} - {round(predictions[0][i], 2)}")
@@ -73,7 +74,6 @@ def main():
         matrix = gen_matrix()
         t2 = time.perf_counter()
         print(f"Time taken for capture: {t2 - t1}")
-        # p2 = multiprocessing.Process(target=predict, args=[matrix])
         p2 = threading.Thread(target=predict, args=[matrix])
         p2.start()
         t3 = time.perf_counter()
