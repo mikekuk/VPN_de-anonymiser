@@ -17,3 +17,7 @@ data_visulise.ipynb is sued to visualise the extracted arrays.
 ml_test.ipynb is used to train and save the models. 
 
 
+Crontab entry for client VM:
+```
+* * * * * DISPLAY=:0 /home/user/Documents/data_collect/bin/python3 /home/user/Documents/gen_data.py
+```

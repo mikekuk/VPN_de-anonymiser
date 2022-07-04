@@ -20,13 +20,16 @@ import time
 import tensorflow as tf
 
 
-TIME_FRAME = 10
-CLIENT = "10.249.147.245"
-IFACE = "en0"
-OFFSET = 5
-SCALER_MAX = 709.0  # Max values observed during training
+TIME_FRAME = 20
+CLIENT = "192.168.254.0"
+IFACE = "ens33"
+OFFSET = 0
+SCALER_MAX = 709.0  # Max values observed during training, thus required for current model.
 
+print("[+] Loading model.")
 model = tf.keras.models.load_model('models/convlstm_model_Datetime_2022_05_26__23_52_24__loss_0.08553284406661987_acc_0.9906666874885559.h5')
+print(f"[+] Loaded model {model}.")
+
 
 SITES = [
     "www.amazon.co.uk",
