@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 # Work in progress. Currently visualise 20 sec capture. Will go on to make predictions onn rolling 20 sec capture.
-# Needs to run as root to sniff interface.
 
 
 # Suppress excess logging to terminal.
@@ -21,7 +20,7 @@ import time
 import tensorflow as tf
 
 
-TIME_FRAME = 20
+TIME_FRAME = 10
 CLIENT = "192.168.254.0"
 IFACE = "ens33"
 OFFSET = 0
