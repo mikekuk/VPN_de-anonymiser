@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Work in progress. Currently visualise 20 sec capture. Will go on to make predictions onn rolling 20 sec capture.
+# Needs to run as root to sniff interface.
 
 
 # Suppress excess logging to terminal.
