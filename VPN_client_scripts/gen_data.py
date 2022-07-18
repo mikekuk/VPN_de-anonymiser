@@ -8,7 +8,7 @@ from selenium.webdriver.firefox.options import Options
 import datetime as dt
 import os
 import pandas as pd
-import threading
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 CAPTURE_AT_ROUTER = False
@@ -41,6 +41,11 @@ if INCLUDE_OTHER_SITES:
 options = Options()
 options.add_argument("-profile")
 options.add_argument("/home/user/firefox_profiles/y557o7bc.default")
+caps = DesiredCapabilities().FIREFOX
+# caps["pageLoadStrategy"] = "normal"  #  complete
+caps["pageLoadStrategy"] = "eager"  #  interactive
+# caps["pageLoadStrategy"] = "none"   #  undefined
+
 date_time_format = '%Y_%m_%d__%H_%M_%S'
 
 def load_rand_page():
@@ -73,17 +78,12 @@ def load_rand_page():
         # Not required is capturing at router
 
     time.sleep(start_delay)
-    browser=webdriver.Firefox(options=options)
-
-    def load_site(browser, site):
-        browser.get(f'https://{site}')
-        
-    t1 = threading.Thread(target=load_site, args=[browser, site])
-    t1.start()
-
+    
+    browser=webdriver.Firefox(options=options, capabilities=caps)
+    browser.get(f'https://{site}')
     time.sleep(time_hang)
     browser.close()
-
+    
     end_time = dt.datetime.now()
 
     csv_row = f"{start_time}, {end_time}, {site_idx}, {site}, {time_hang}"
@@ -100,3 +100,4 @@ delays = load_rand_page()
 time.sleep(30 - delays)
 
 load_rand_page()
+
