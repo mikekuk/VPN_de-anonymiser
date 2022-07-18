@@ -8,10 +8,11 @@ from selenium.webdriver.firefox.options import Options
 import datetime as dt
 import os
 import pandas as pd
+import threading
 
 
 CAPTURE_AT_ROUTER = False
-INCLUDE_OTHER_SITES = False
+INCLUDE_OTHER_SITES = True
 
 SITES = [
     "www.google.com",
@@ -28,7 +29,7 @@ SITES = [
 # Source: https://www.similarweb.com/top-websites/united-kingdom/
 
 if INCLUDE_OTHER_SITES:
-    df = pd.read_csv("top-1m.csv", names=["ranking", "site"])
+    df = pd.read_csv("/home/user/Documents/VPN_de-anonymiser/top-1m.csv", names=["ranking", "site"])
     # Source: https://www.kaggle.com/datasets/cheedcheed/top1m?resource=download
     sites_no_www = [site[4:] for site in SITES]
     other_sites = df[~df.site.isin(sites_no_www)]
@@ -72,12 +73,15 @@ def load_rand_page():
         # Not required is capturing at router
 
     time.sleep(start_delay)
-
     browser=webdriver.Firefox(options=options)
-    browser.get(f'https://{site}')
+
+    def load_site(browser, site):
+        browser.get(f'https://{site}')
+        
+    t1 = threading.Thread(target=load_site, args=[browser, site])
+    t1.start()
 
     time.sleep(time_hang)
-
     browser.close()
 
     end_time = dt.datetime.now()
@@ -96,4 +100,3 @@ delays = load_rand_page()
 time.sleep(30 - delays)
 
 load_rand_page()
-
