@@ -67,6 +67,7 @@ def gen_matrix():
 def predict(matrix):
     predictions = model.predict(matrix/SCALER_MAX)
     print("\n\n")
+    print(f"[+] Prediction = {SITES[np.argmax(predictions, axis=1])}")
     for i in range(len(SITES)):
         print(f"{SITES[i]} - {round(predictions[0][i], 2)}")
     print("\n\n")
