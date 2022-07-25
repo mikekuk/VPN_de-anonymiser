@@ -37,6 +37,7 @@ print(f"[+] Loaded model {model}.")
 
 
 SITES = [
+    "Other",
     "www.amazon.co.uk",
     "www.bbc.co.uk",
     "www.ebay.co.uk",
