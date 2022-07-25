@@ -2,7 +2,6 @@
 
 # Work in progress. Currently visualise 20 sec capture. Will go on to make predictions onn rolling 20 sec capture.
 
-
 # Suppress excess logging to terminal.
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -24,10 +23,16 @@ TIME_FRAME = 10
 CLIENT = "192.168.254.0"
 IFACE = "ens33"
 OFFSET = 0
-SCALER_MAX = 709.0  # Max values observed during training, thus required for current model.
+SCALER_MAX = 1278.0  # Max values observed during training, thus required for current model. 
+
+# 709.0 for initial model
+# 1278.0 for additional data model
+
+
+MODEL = "models/convlstm_model_out_of_band_data_test_Datetime_2022_07_25__18_28_45__loss_0.32486578822135925_acc_0.8711656332015991.h5"
 
 print("[+] Loading model.")
-model = tf.keras.models.load_model('models/convlstm_model_Datetime_2022_05_26__23_52_24__loss_0.08553284406661987_acc_0.9906666874885559.h5')
+model = tf.keras.models.load_model(MODEL)
 print(f"[+] Loaded model {model}.")
 
 
