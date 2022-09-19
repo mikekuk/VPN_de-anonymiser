@@ -33,7 +33,7 @@ MODEL = "models/convlstm_model_out_of_band_data_test_Datetime_2022_07_25__18_28_
 
 print("[+] Loading model.")
 model = tf.keras.models.load_model(MODEL)
-print(f"[+] Loaded model {model}.")
+print(f"[+] Loaded model {MODEL}.")
 
 
 SITES = [

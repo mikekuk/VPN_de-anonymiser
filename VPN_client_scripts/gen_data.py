@@ -13,6 +13,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 CAPTURE_AT_ROUTER = False
 INCLUDE_OTHER_SITES = True
+OPENWORLD_RATIO = 0.5 # ratio of len(SITES) to add as openwrold data. eg, 0.5 means add half the length of the SITES list as openworld sites (0.5:1 ratio), 1 means add the number (1:1 ratio)
 
 SITES = [
     "www.google.com",
@@ -52,15 +53,19 @@ def load_rand_page():
     
     start_time = dt.datetime.now()
 
+    len_sites = len(SITES)
+    addition = int(len_sites * (1 + OPENWORLD_RATIO))
+
     start_delay = random.randint(1,50) /10
+
     if INCLUDE_OTHER_SITES:
-        site_idx = random.randint(0,14)
+        site_idx = random.randint(0,(len_sites + addition -1))
     else:
-        site_idx = random.randint(0,9)
+        site_idx = random.randint(0,len_sites - 1)
     # If INCLUDE_OTHER_SITES is true, it will make 1/3 of sites a random selection from the other sites list.
     time_hang = random.randint(5, 10)
 
-    if site_idx < 10:
+    if site_idx < len_sites:
         site = SITES[site_idx]
     else:
         site = get_rand_other_site()
