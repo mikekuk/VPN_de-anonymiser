@@ -61,7 +61,7 @@ def load_rand_page():
     start_delay = random.randint(1,50) /10
 
     if INCLUDE_OTHER_SITES:
-        site_idx = random.randint(0,(len_sites + addition -1))
+        site_idx = random.randint(0,(len_sites + addition))
     else:
         site_idx = random.randint(0,len_sites - 1)
     # If INCLUDE_OTHER_SITES is true, it will make 1/3 of sites a random selection from the other sites list.
