@@ -9,44 +9,33 @@ import datetime as dt
 import os
 import pandas as pd
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
+from selenium.common.exceptions import TimeoutException
+import threading
+VM_NAME = "VM1"
 
 CAPTURE_AT_ROUTER = False
 INCLUDE_OTHER_SITES = True
-OPENWORLD_RATIO = 0.5 # ratio of len(SITES) to add as openwrold data. eg, 0.5 means add half the length of the SITES list as openworld sites (0.5:1 ratio), 1 means add the number (1:1 ratio)
+OPENWORLD_RATIO = 1 # ratio of len(SITES) to add as openwrold data. eg, 0.5 means add half the length of the SITES list as openworld sites (0.5:1 ratio), 1 means add the number (1:1 ratio)
 
-SITES = [
-    "www.google.com",
-    "www.youtube.com",
-    "www.facebook.com",
-    "www.bbc.co.uk",
-    "www.twitter.com",
-    "www.amazon.co.uk",
-    "www.google.co.uk",
-    "www.wikipedia.com",
-    "www.ebay.co.uk",
-    "www.uwe.ac.uk"
-]
-# Source: https://www.similarweb.com/top-websites/united-kingdom/
 
-sites_df = pd.read_csv("data/urls/top_100.csv", names=["ranking", "site"])
+sites_df = pd.read_csv("/home/user/Documents/urls/top_100.csv", names=["ranking", "site"])
 sites = list(sites_df.site)
 
 if INCLUDE_OTHER_SITES:
-    df = pd.read_csv("data/urls/top10k_cleaned.csv", names=["ranking", "site"])
+    df = pd.read_csv("/home/user/Documents/urls/top10k_cleaned.csv", names=["ranking", "site"])
     # Source: https://www.kaggle.com/datasets/cheedcheed/top1m?resource=download
     other_sites = df[~df.site.isin(sites)]
     def get_rand_other_site():
         randint = random.randint(0, len(other_sites) -1)
         return other_sites.site.iloc[randint]
-    # Opens top 1m sties are removes duplicates from the SITES list. DEfines a function to return one random site.
+    # Opens top 1m sties are removes duplicates from the SITES list. Defines a function to return one random site.
 
 options = Options()
 options.add_argument("-profile")
 options.add_argument("/home/user/firefox_profiles/y557o7bc.default")
 caps = DesiredCapabilities().FIREFOX
-# caps["pageLoadStrategy"] = "normal"  #  complete
-caps["pageLoadStrategy"] = "eager"  #  interactive
+caps["pageLoadStrategy"] = "normal"  #  complete
+# caps["pageLoadStrategy"] = "eager"  #  interactive
 # caps["pageLoadStrategy"] = "none"   #  undefined
 
 date_time_format = '%Y_%m_%d__%H_%M_%S'
@@ -61,11 +50,11 @@ def load_rand_page():
     start_delay = random.randint(1,50) /10
 
     if INCLUDE_OTHER_SITES:
-        site_idx = random.randint(0,(len_sites + addition))
+        site_idx = random.randint(0,(len_sites + addition -1))
     else:
         site_idx = random.randint(0,len_sites - 1)
     # If INCLUDE_OTHER_SITES is true, it will make 1/3 of sites a random selection from the other sites list.
-    time_hang = random.randint(5, 10)
+    time_hang = random.randint(10, 15)
 
     if site_idx < len_sites:
         site = sites[site_idx]
@@ -80,22 +69,34 @@ def load_rand_page():
 
     if not CAPTURE_AT_ROUTER:
         datetime_string = dt.datetime.strftime(start_time, date_time_format)
-        pcap_name = f"{site}-{site_idx}-{time_hang}-{datetime_string}"
+        pcap_name = f"{site}-{VM_NAME}-{site_idx}-{time_hang}-{datetime_string}"
         os.system(f"/home/user/Documents/make_pcap.sh {pcap_name} &")
         # Not required is capturing at router
 
     time.sleep(start_delay)
-    
     browser=webdriver.Firefox(options=options, capabilities=caps)
-    browser.get(f'https://{site}')
-    time.sleep(time_hang)
-    browser.close()
+    browser.set_page_load_timeout(time_hang)
+
+    try:
+        browser.get(f'https://{site}')
+        time.sleep(time_hang)
+        browser.close()
+        status = "success"
+    except TimeoutException as e:
+        print("[-] Page load Timeout Occurred. Quitting !!!")
+        browser.close()
+        status = "timeout"
+    except BaseException as e:
+        print(f"[-] Other error occurred. {e} Quitting !!!")
+        browser.close()
+        status = f"{str(e).replace(',', ' - ')}"
+    
     
     end_time = dt.datetime.now()
 
-    csv_row = f"{start_time}, {end_time}, {site_idx}, {site}, {time_hang}"
+    csv_row = f"{start_time}, {end_time}, {site_idx}, {site}, {time_hang}, {status}"
 
-    if CAPTURE_AT_ROUTER:
+    if not CAPTURE_AT_ROUTER:
         with open("//mnt/hgfs/log.csv", "a") as f:
             f.write(csv_row + "\n")
     
