@@ -34,6 +34,7 @@ if INCLUDE_OTHER_SITES:
     # Opens top 1m sties are removes duplicates from the SITES list. Defines a function to return one random site.
 
 options = Options()
+options.binary_location = 'C:\\Program Files\\Mozilla Firefox\\firefox.exe'
 options.add_argument("-profile")
 options.add_argument("C:\\Users\\Administrator\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\i315s0il.default-release-1")
 caps = DesiredCapabilities().FIREFOX
