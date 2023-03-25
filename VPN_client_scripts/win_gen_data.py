@@ -1,3 +1,5 @@
+#!/home/user/Documents/data_collect/bin/python3
+
 import time
 import random
 from selenium import webdriver
@@ -10,6 +12,8 @@ import pandas as pd
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import TimeoutException
 import threading
+
+
 VM_NAME = "VM1"
 
 CAPTURE_AT_ROUTER = False
@@ -31,7 +35,7 @@ if INCLUDE_OTHER_SITES:
 
 options = Options()
 options.add_argument("-profile")
-options.add_argument("C:\\Users\\Administrator\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\8spgbz2s.default")
+options.add_argument("C:\\Users\\Administrator\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\i315s0il.default-release-1")
 caps = DesiredCapabilities().FIREFOX
 caps["pageLoadStrategy"] = "normal"  #  complete
 # caps["pageLoadStrategy"] = "eager"  #  interactive
@@ -44,9 +48,9 @@ def load_rand_page():
     start_time = dt.datetime.now()
 
     len_sites = len(sites)
-    addition = int(len_sites * (1 + OPENWORLD_RATIO))
+    addition = int(len_sites * (OPENWORLD_RATIO))
 
-    start_delay = random.randint(1,50) /10
+    start_delay = random.randint(1,30) /10
 
     if INCLUDE_OTHER_SITES:
         site_idx = random.randint(0,(len_sites + addition -1))
@@ -74,7 +78,7 @@ def load_rand_page():
         # Not required is capturing at router
 
     time.sleep(start_delay)
-    browser=webdriver.Firefox(options=options, capabilities=caps)
+    browser=webdriver.Firefox(executable_path="C:\\Drivers\\geckodriver.exe", options=options, capabilities=caps)
     browser.set_page_load_timeout(time_hang)
 
     try:
@@ -91,8 +95,10 @@ def load_rand_page():
         browser.close()
         status = f"{str(e).replace(',', ' - ')}"
     
+    browser.close()
     
     end_time = dt.datetime.now()
+
 
     csv_row = f"{start_time}, {end_time}, {site_idx}, {site}, {time_hang}, {status}"
 
@@ -102,10 +108,6 @@ def load_rand_page():
     
     return (end_time - start_time).seconds
 
-
-delays = load_rand_page()
-
-time.sleep(30 - delays)
 
 load_rand_page()
 
