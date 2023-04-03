@@ -12,14 +12,22 @@ import pandas as pd
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import TimeoutException
 import threading
+from scapy.all import *
+import numpy as np
 
-
-VM_NAME = "VM1"
 
 CAPTURE_AT_ROUTER = False
 INCLUDE_OTHER_SITES = True
 OPENWORLD_RATIO = 1 # ratio of len(SITES) to add as openwrold data. eg, 0.5 means add half the length of the SITES list as openworld sites (0.5:1 ratio), 1 means add the number (1:1 ratio)
+TIMEFRAME = 20
 
+# Constants for array extractiion
+MIN_PACKETS = 20
+
+CLIENT_SUBNET = '172'
+
+
+hostname = os.environ['COMPUTERNAME']
 
 sites_df = pd.read_csv("C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\urls\\top_100.csv", names=["ranking", "site"])
 sites = list(sites_df.site)
@@ -33,6 +41,9 @@ if INCLUDE_OTHER_SITES:
         return other_sites.site.iloc[randint]
     # Opens top 1m sties are removes duplicates from the SITES list. Defines a function to return one random site.
 
+
+
+
 options = Options()
 options.binary_location = 'C:\\Program Files\\Mozilla Firefox\\firefox.exe'
 options.add_argument("-profile")
@@ -43,6 +54,14 @@ caps["pageLoadStrategy"] = "normal"  #  complete
 # caps["pageLoadStrategy"] = "none"   #  undefined
 
 date_time_format = '%Y_%m_%d__%H_%M_%S'
+
+
+# Define a function to run the tshark command
+def run_tshark(name):
+    cmd = f'"C:\\Program Files\\Wireshark\\tshark.exe" -i 4 -s 128 -a duration:20 -w "C:\\Users\\Administrator\\Documents\\pcaps\\{name}.pcap" host 154.16.196.216'
+    subprocess.run(cmd, shell=True)
+
+
 
 def load_rand_page():
     
@@ -73,9 +92,16 @@ def load_rand_page():
 
     if not CAPTURE_AT_ROUTER:
         datetime_string = dt.datetime.strftime(start_time, date_time_format)
-        pcap_name = f"{site}-{VM_NAME}-{site_idx}-{time_hang}-{datetime_string}"
-        # subprocess.Popen(["start", "", "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\make_pcap.bat", pcap_name], shell=True)
-        os.system(f'start "" C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\make_pcap.bat {pcap_name}')
+        pcap_name = f"{site}-{hostname}-{site_idx}-{time_hang}-{datetime_string}"
+
+
+        
+        # Run the tshark command in a separate thread  
+        tshark_thread = threading.Thread(target=run_tshark, args=(pcap_name,))
+        tshark_thread.start()
+    
+        
+        # os.system(f'start "" C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\make_pcap.bat {pcap_name}')
         # Not required is capturing at router
 
     time.sleep(start_delay)
@@ -95,10 +121,15 @@ def load_rand_page():
         print(f"[-] Other error occurred. {e} Quitting !!!")
         browser.close()
         status = f"{str(e).replace(',', ' - ')}"
+
     
-    browser.close()
+    browser.quit()
+    
+    # browser.close()
     
     end_time = dt.datetime.now()
+
+    tshark_thread.join()
 
 
     csv_row = f"{start_time}, {end_time}, {site_idx}, {site}, {time_hang}, {status}"
@@ -107,8 +138,44 @@ def load_rand_page():
         with open("C:\\Users\\Administrator\\Documents\\pcaps.log.csv", "a") as f:
             f.write(csv_row + "\n")
     
-    return (end_time - start_time).seconds
 
+    def extract_features_from_clips(clip):
+
+        matrix = np.zeros([TIMEFRAME * 10, 150, 2])
+        start_time = clip[0].time
+        for pkt in clip:
+            if IP in pkt:
+                length = (lambda x: x if x <= 1500 else 1500)(pkt[IP].len) # Packets over 1500 are rounded down to 1500
+                dir = (lambda x: 0 if x[IP].src[:3] == CLIENT_SUBNET else 1)(pkt)
+                time_round = round(pkt.time - start_time, 1) 
+                matrix[int(time_round * 10)-1][int(length / 10)-1][dir] += 1
+        return np.array(matrix)
+    
+
+    last_pcap = rdpcap(f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap")
+    
+    array = extract_features_from_clips(last_pcap)
+    
+    with open(f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}.npy', "wb") as f:
+        np.save(f, array)
+
+    pcap_path = f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap"
+    array_path  = f"C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}.npy"
+
+    def copy_and_delete(file_path):
+        if file_path[-3:] == 'cap':
+                location = "pcaps"
+        else:
+            location = "arrays"
+
+        copy_cmd = f'aws s3 cp "{file_path}" s3://{location}-for-wfa/'
+        delete_cmd = f'del "{file_path}"'
+
+        subprocess.run(copy_cmd, shell=True)
+        subprocess.run(delete_cmd, shell=True)
+    
+    copy_and_delete(pcap_path)
+    copy_and_delete(array_path)
 
 load_rand_page()
 
