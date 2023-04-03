@@ -1,97 +1,38 @@
-import os
-import shutil
-from scapy.all import *
+from matplotlib import pyplot as plt
+import numpy as np
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
+
+def plot_history(history):
+    fig, axs = plt.subplots(1, 2, figsize=(10,5)) 
+    (ax1, ax2) = axs
+    ax1.plot(history.history['loss'], label='train')
+    ax1.plot(history.history['val_loss'], label='validation')
+
+    ax1.legend(loc="upper right")
+    ax1.set_xlabel("# of epochs")
+    ax1.set_ylabel("loss")
+
+    ax2.plot(history.history['accuracy'], label='train')
+    ax2.plot(history.history['val_accuracy'], label='validation')
+
+    ax2.legend(loc="upper right")
+    ax2.set_xlabel("# of epochs")
+    ax2.set_ylabel("accuracy")
+
+    print("Final training accuracy:", history.history['accuracy'][-1])
+    print("Final validation accuracy:", history.history['val_accuracy'][-1])
 
 
-
-def check_paths(paths: list):
-    """
-    Checks all paths are valid directories.
-    """
-    print(f"[+] Extracting following paths: {paths}")
-    for path in paths:
-        if os.path.exists(path) and os.path.isdir(path):
-            print(f"[+] {path} OK.")
-        else:
-            print(f"[!] ERROR - {path} not valid.")
-    print("[+] All paths OK.")
-
-
-
-def check_dependencies():
-    """
-    Checks all command line utilities are installed and present in PATH.
-    """
-    tools = [
-        "editcap",
-    ]
-    print(f"[+] Checking install command line utilities: {tools}")
-    status = True
-    for tool in tools:
-        status = shutil.which(tool) is not None
-        if not status:
-            print(f"[!] {tool} not installed.")
-    if status:
-        print("[+] All dependencies OK.")
-    return status
-
-
-def split_to_clips(file_path: str, timeframe: int, clips_dir: str):
-    print(f"[+] Getting clips from {file_path}.")
-    if not file_path[-5:] == ".pcap":
-        print(f"[!] {file_path} is not of pcap format!")
-        return 1
-    else:
-        os.system(f"editcap -i {timeframe} -s 128 {file_path} {clips_dir}/{file_path.split('/')[-1]}-{timeframe}_sec_clip.pcap")
-        print(f"[+] Extracted clips from {file_path}.")
-    
-
-def extract_streams(path: str, file: str):
-    """
-    Reads pcap and pcapng files and extraces bidirectional streams.
-    These are then saved as new pcaps in a directory named extracted,
-    The files are named with the original file, src and dst IP and port.
-    """
-    packets = rdpcap(f"{path}/{file}")
-
-    def get_stream(pcap):
-        # Creates dict of the packets for bi-directional streams
-        streams = {}
-
-        def check_names(src, dst, sport, dport):
-            # Checks if stream already exists in either direction
-            name1 = f"{src}-{dst}-{sport}-{dport}"
-            name2 = f"{dst}-{src}-{dport}-{sport}"
-            if name1 in streams:
-                return name1
-            elif name2 in streams:
-                return name2
-            else:
-                return False
-
-        for pkt in pcap:
-            if TCP in pkt:
-                src = pkt[IP].src
-                dst = pkt[IP].dst
-                sport = pkt[TCP].sport
-                dport = pkt[TCP].dport
-                name = check_names(src, dst, sport, dport)
-                if name:
-                    streams[name].append(pkt)
-                else:
-                    name = f"{src}-{dst}-{sport}-{dport}"
-                    streams[name] = []
-                    streams[name].append(pkt)
-        return streams
-
-    streams = get_stream(packets)
-
-    # Extract the pcaps from the file
-    if file[-5:] == ".pcap":
-        epath = f"{path}/extracted/{file[:-5]}"
-    elif file[-7:] == ".pcapng":
-        epath = f"{path}/extracted/{file[:-7]}"
-    if not (os.path.exists(epath) and os.path.isdir(epath)):
-        os.mkdir(epath)
-    for name, stream in streams.items():
-        wrpcap(f"{epath}/{file[:-5]}-{name}.pcap", stream)
+def plot_results(model, features_test, y_true, label_binariser):
+    unique_y = np.unique(y_true)
+    fig, ax = plt.subplots(figsize=(30, 30))
+    y_true = np.argmax(labels_test, axis=1)
+    predictions =  np.argmax(model.predict(features_test), axis=1)
+    cm = confusion_matrix(y_true, predictions, normalize='true')
+    disp = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
+        display_labels=[label_binariser.classes_[x] for x in range(unique_y.min(), len(unique_y))]
+        )
+    disp.plot(xticks_rotation=270, values_format=".1f", ax=ax)
+    plt.show()
+    print(classification_report(y_true, predictions))
