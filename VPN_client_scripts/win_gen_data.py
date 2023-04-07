@@ -1,5 +1,3 @@
-#!/home/user/Documents/data_collect/bin/python3
-
 import time
 import random
 from selenium import webdriver
@@ -18,7 +16,7 @@ import numpy as np
 
 CAPTURE_AT_ROUTER = False
 INCLUDE_OTHER_SITES = True
-OPENWORLD_RATIO = 1 # ratio of len(SITES) to add as openwrold data. eg, 0.5 means add half the length of the SITES list as openworld sites (0.5:1 ratio), 1 means add the number (1:1 ratio)
+OPENWORLD_RATIO = 0.5 # ratio of len(SITES) to add as openwrold data. eg, 0.5 means add half the length of the SITES list as openworld sites (0.5:1 ratio), 1 means add the number (1:1 ratio)
 TIMEFRAME = 20
 
 # Constants for array extractiion
@@ -27,9 +25,9 @@ MIN_PACKETS = 20
 CLIENT_SUBNET = '172'
 
 
-hostname = os.environ['COMPUTERNAME']
+hostname = os.environ['HOST_TAG']
 
-sites_df = pd.read_csv("C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\urls\\top_100.csv", names=["ranking", "site"])
+sites_df = pd.read_csv("C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\urls\\top_100_v2.csv", names=["ranking", "site"])
 sites = list(sites_df.site)
 
 if INCLUDE_OTHER_SITES:
