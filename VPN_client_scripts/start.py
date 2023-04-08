@@ -5,7 +5,7 @@ import requests
 import os
 
 
-# Get Host details and write to enviroment variable for win_gen_data.py to read.
+# Get Host detils and write to enviroment varible for win_gen_data.py to read.
 
 def get_instance_id():
     # Get instance metadata from the metadata service
@@ -59,9 +59,27 @@ def get_tag_value(instance_id, tag_key, region_id):
 
     return None
 
-host_tag = get_tag_value(get_instance_id(), "Name", get_region_id())
+intstance_id = get_instance_id()
+region = get_region_id()
+
+host_tag = get_tag_value(intstance_id, "Name", region)
+ow_ratio_tag = get_tag_value(intstance_id, "Ratio", region)
+pet_tag = get_tag_value(intstance_id, "PET", region)
 
 os.environ["HOST_TAG"] = host_tag
+
+# Get open world ratio if tag exists
+try:
+    os.environ["OW_RATIO"] = ow_ratio_tag
+except:
+    pass
+
+# Get PET if tag exists
+try:
+    os.environ["PET"] = pet_tag
+except:
+    pass
+
 
 # Update urls list
 
@@ -74,10 +92,14 @@ def download_and_save(url, file_path):
     with open(file_path, "wb") as file:
         file.write(response.content)
 
-
+# Update csv list
 url = "https://raw.githubusercontent.com/mikekuk/VPN_de-anonymiser/main/VPN_client_scripts/urls/top_100_v2.csv"
-file_path = "VPN_client_scripts\\urls\\top_100_v2.csv"
-
+file_path = "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\urls\\top_100_v2.csv"
 download_and_save(url, file_path)
 
-subprocess.run(["python", "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\win_gen_data.py"])
+# Update win_get_data
+url = "https://raw.githubusercontent.com/mikekuk/VPN_de-anonymiser/main/VPN_client_scripts/win_gen_data.py"
+file_path = "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\win_gen_data.py"
+download_and_save(url, file_path)
+
+subprocess.run(["python", "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\collect.py"])
