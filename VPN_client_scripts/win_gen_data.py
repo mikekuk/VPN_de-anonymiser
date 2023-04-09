@@ -234,8 +234,9 @@ def load_rand_page():
                     cumul_encoding[i] += size
                 elif i < 100 and not inbound:
                     cumul_encoding[i] -= size
-
-        return np.array(matrix_small), np.array(matrix_large), np.array(df_encoding), np.array(cumul_encoding)
+                
+                
+        return np.array(matrix_small), np.array(matrix_large), np.array(df_encoding), np.cumsum(np.array(cumul_encoding))
     
 
     last_pcap = rdpcap(f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap")
