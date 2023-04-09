@@ -28,7 +28,7 @@ OPENWORLD_RATIO = 0.5 # ratio of len(SITES) to add as openwrold data. eg, 0.5 me
 TIMEFRAME = 20
 
 # Constants for array extractiion
-MIN_PACKETS = 20
+MIN_PACKETS = 50
 
 CLIENT_SUBNET = '172'
 
@@ -240,55 +240,57 @@ def load_rand_page():
     
 
     last_pcap = rdpcap(f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap")
+
+    if len(last_pcap) > MIN_PACKETS:
     
-    array_small, array_large, df_encoding, cumul_encoding = extract_features_from_clips(last_pcap)
+        array_small, array_large, df_encoding, cumul_encoding = extract_features_from_clips(last_pcap)
 
 
-    # # Comment out for prod, just used for testing.
-    # from matplotlib import pyplot as plt
-    # plt.imshow(np.pad(array, (0,1)), aspect="auto")
-    # plt.show()
+        # # Comment out for prod, just used for testing.
+        # from matplotlib import pyplot as plt
+        # plt.imshow(np.pad(array, (0,1)), aspect="auto")
+        # plt.show()
 
 
-    pcap_path = f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap"
-    array_small_path  = f"C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-small.npy"
-    array_large_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-large.npy'
-    df_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-df.npy'
-    cumul_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-cumul.npy'
-    
-    with open(array_small_path, "wb") as f:
-        np.save(f, array_small)
+        pcap_path = f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap"
+        array_small_path  = f"C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-small.npy"
+        array_large_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-large.npy'
+        df_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-df.npy'
+        cumul_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-cumul.npy'
+        
+        with open(array_small_path, "wb") as f:
+            np.save(f, array_small)
 
-            
-    with open(array_large_path, "wb") as f:
-        np.save(f, array_large)
+                
+        with open(array_large_path, "wb") as f:
+            np.save(f, array_large)
 
-            
-    with open(df_encoding_path, "wb") as f:
-        np.save(f, df_encoding)
+                
+        with open(df_encoding_path, "wb") as f:
+            np.save(f, df_encoding)
 
-            
-    with open(cumul_encoding_path, "wb") as f:
-        np.save(f, cumul_encoding)
+                
+        with open(cumul_encoding_path, "wb") as f:
+            np.save(f, cumul_encoding)
 
 
-    def copy_and_delete(file_path):
-        if file_path[-3:] == 'cap':
-                location = "pcaps"
-        else:
-            location = "arrays"
+        def copy_and_delete(file_path):
+            if file_path[-3:] == 'cap':
+                    location = "pcaps"
+            else:
+                location = "arrays"
 
-        copy_cmd = f'aws s3 cp "{file_path}" s3://{location}-for-wfa/'
-        delete_cmd = f'del "{file_path}"'
+            copy_cmd = f'aws s3 cp "{file_path}" s3://{location}-for-wfa/'
+            delete_cmd = f'del "{file_path}"'
 
-        subprocess.run(copy_cmd, shell=True)
-        subprocess.run(delete_cmd, shell=True)
-    
-    copy_and_delete(pcap_path)
-    copy_and_delete(array_small_path)
-    copy_and_delete(array_large_path)
-    copy_and_delete(df_encoding_path)
-    copy_and_delete(cumul_encoding_path)
+            subprocess.run(copy_cmd, shell=True)
+            subprocess.run(delete_cmd, shell=True)
+        
+        copy_and_delete(pcap_path)
+        copy_and_delete(array_small_path)
+        copy_and_delete(array_large_path)
+        copy_and_delete(df_encoding_path)
+        copy_and_delete(cumul_encoding_path)
 
 load_rand_page()
 
