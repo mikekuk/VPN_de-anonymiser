@@ -200,102 +200,123 @@ def load_rand_page():
     tshark_thread.join()
 
 
-    csv_row = f"{start_time}, {end_time}, {site_idx}, {site}, {time_hang}, {status}"
+    # csv_row = f"{start_time}, {end_time}, {site_idx}, {site}, {time_hang}, {status}"
 
-    if not CAPTURE_AT_ROUTER:
-        with open("C:\\Users\\Administrator\\Documents\\pcaps.log.csv", "a") as f:
-            f.write(csv_row + "\n")
+    # if not CAPTURE_AT_ROUTER:
+    #     with open("C:\\Users\\Administrator\\Documents\\pcaps.log.csv", "a") as f:
+    #         f.write(csv_row + "\n")
     
 
-    def is_inbound(packet):
-        if packet[IP].src[:3] == CLIENT_SUBNET:
-            return False
-        else:
-            return True
+    # def is_inbound(packet):
+    #     if packet[IP].src[:3] == CLIENT_SUBNET:
+    #         return False
+    #     else:
+    #         return True
 
-    def extract_features_from_clips(clip):
+    # def extract_features_from_clips(clip):
 
-        matrix_small = np.zeros([TIMEFRAME * 10, 150, 2])
-        matrix_large = np.zeros([TIMEFRAME * 100, 1500, 2])
-        df_encoding = np.zeros(5000, dtype=int)
-        cumul_encoding = np.zeros(100)
+    #     matrix_small = np.zeros([TIMEFRAME * 10, 150, 2])
+    #     matrix_large = np.zeros([TIMEFRAME * 100, 1500, 2])
+    #     df_encoding = np.zeros(5000, dtype=int)
+    #     cumul_encoding = np.zeros(100)
 
-        start_time = clip[0].time
+    #     start_time = clip[0].time
 
-        for i, pkt in enumerate(clip):
-            if IP in pkt:
+    #     for i, pkt in enumerate(clip):
+    #         if IP in pkt:
 
-                size = pkt[IP].len
-                inbound = is_inbound(pkt)
+    #             size = pkt[IP].len
+    #             inbound = is_inbound(pkt)
 
-                # Matrix small
+    #             # Matrix small
 
-                length = (lambda x: x if x <= 1500 else 1500)(size) # Packets over 1500 are rounded down to 1500
-                dir = (lambda: 0 if inbound else 1)()
-                time_round = round(pkt.time - start_time, 2) 
-                if time_round >= 20:
-                    time_round = 20.0
-                matrix_small[int(round(time_round, 1) * 10)-1][int(length / 10)-1][dir] += 1
+    #             length = (lambda x: x if x <= 1500 else 1500)(size) # Packets over 1500 are rounded down to 1500
+    #             dir = (lambda: 0 if inbound else 1)()
+    #             time_round = round(pkt.time - start_time, 2) 
+    #             if time_round >= 20:
+    #                 time_round = 20.0
+    #             matrix_small[int(round(time_round, 1) * 10)-1][int(length / 10)-1][dir] += 1
 
-                # Matrix large
+    #             # Matrix large
 
-                matrix_large[int(time_round * 100)-1][int(length)-1][dir] += 1
+    #             matrix_large[int(time_round * 100)-1][int(length)-1][dir] += 1
 
-                # DF
+    #             # DF
 
-                if i < 5000 and inbound:
-                    df_encoding[i] = 1
-                elif i < 5000 and not inbound:
-                    df_encoding[i] = -1
+    #             if i < 5000 and inbound:
+    #                 df_encoding[i] = 1
+    #             elif i < 5000 and not inbound:
+    #                 df_encoding[i] = -1
 
                 
-                # CUMUL
+    #             # CUMUL
 
-                if i < 100 and inbound:
-                    cumul_encoding[i] += size
-                elif i < 100 and not inbound:
-                    cumul_encoding[i] -= size
+    #             if i < 100 and inbound:
+    #                 cumul_encoding[i] += size
+    #             elif i < 100 and not inbound:
+    #                 cumul_encoding[i] -= size
                 
                 
-        return np.array(matrix_small), np.array(matrix_large), np.array(df_encoding), np.cumsum(np.array(cumul_encoding))
+    #     return np.array(matrix_small), np.array(matrix_large), np.array(df_encoding), np.cumsum(np.array(cumul_encoding))
     
 
-    last_pcap = rdpcap(f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap")
+    # last_pcap = rdpcap(f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap")
 
-    if len(last_pcap) > MIN_PACKETS:
+    # if len(last_pcap) > MIN_PACKETS:
     
-        array_small, array_large, df_encoding, cumul_encoding = extract_features_from_clips(last_pcap)
+    #     array_small, array_large, df_encoding, cumul_encoding = extract_features_from_clips(last_pcap)
 
 
-        # # Comment out for prod, just used for testing.
-        # from matplotlib import pyplot as plt
-        # plt.imshow(np.pad(array, (0,1)), aspect="auto")
-        # plt.show()
+    #     # # Comment out for prod, just used for testing.
+    #     # from matplotlib import pyplot as plt
+    #     # plt.imshow(np.pad(array, (0,1)), aspect="auto")
+    #     # plt.show()
 
 
-        pcap_path = f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap"
-        array_small_path  = f"C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-small.npy"
-        array_large_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-large.npy'
-        df_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-df.npy'
-        cumul_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-cumul.npy'
+    #     pcap_path = f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap"
+        # array_small_path  = f"C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-small.npy"
+        # array_large_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-large.npy'
+        # df_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-df.npy'
+        # cumul_encoding_path = f'C:\\Users\\Administrator\\Documents\\arrays\\{pcap_name}-cumul.npy'
         
-        with open(array_small_path, "wb") as f:
-            np.save(f, array_small)
+        # with open(array_small_path, "wb") as f:
+        #     np.save(f, array_small)
 
                 
-        with open(array_large_path, "wb") as f:
-            np.save(f, array_large)
+        # with open(array_large_path, "wb") as f:
+        #     np.save(f, array_large)
 
                 
-        with open(df_encoding_path, "wb") as f:
-            np.save(f, df_encoding)
+        # with open(df_encoding_path, "wb") as f:
+        #     np.save(f, df_encoding)
 
                 
-        with open(cumul_encoding_path, "wb") as f:
-            np.save(f, cumul_encoding)
+        # with open(cumul_encoding_path, "wb") as f:
+        #     np.save(f, cumul_encoding)
 
 
-        def copy_and_delete(file_path):
+        # def copy_and_delete(file_path):
+        #     if file_path[-3:] == 'cap':
+        #             location = "pcaps"
+        #     else:
+        #         location = "arrays"
+
+        #     copy_cmd = f'aws s3 cp "{file_path}" s3://{location}-for-wfa/'
+        #     delete_cmd = f'del "{file_path}"'
+
+        #     subprocess.run(copy_cmd, shell=True)
+        #     subprocess.run(delete_cmd, shell=True)
+        
+        # copy_and_delete(pcap_path)
+        # copy_and_delete(array_small_path)
+        # copy_and_delete(array_large_path)
+        # copy_and_delete(df_encoding_path)
+        # copy_and_delete(cumul_encoding_path)
+
+
+
+    pcap_path = f"C:\\Users\\Administrator\\Documents\\pcaps\\{pcap_name}.pcap"
+    def copy_and_delete(file_path):
             if file_path[-3:] == 'cap':
                     location = "pcaps"
             else:
@@ -307,11 +328,7 @@ def load_rand_page():
             subprocess.run(copy_cmd, shell=True)
             subprocess.run(delete_cmd, shell=True)
         
-        copy_and_delete(pcap_path)
-        copy_and_delete(array_small_path)
-        copy_and_delete(array_large_path)
-        copy_and_delete(df_encoding_path)
-        copy_and_delete(cumul_encoding_path)
+    copy_and_delete(pcap_path)
 
 load_rand_page()
 
