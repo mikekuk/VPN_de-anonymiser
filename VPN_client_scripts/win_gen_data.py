@@ -20,6 +20,8 @@ import pandas as pd
 from selenium.common.exceptions import TimeoutException
 import threading
 import numpy as np
+import psutil
+import sys
 
 
 CAPTURE_AT_ROUTER = False
@@ -109,6 +111,20 @@ def run_tshark(name):
         cmd = f'"C:\\Program Files\\Wireshark\\tshark.exe" -i 4 -s 128 -a duration:20 -w "C:\\Users\\Administrator\\Documents\\pcaps\\{name}.pcap" host 154.16.196.216'
     subprocess.run(cmd, shell=True)
 
+def is_tshark_running():
+    for process in psutil.process_iter(["name"]):
+        if process.info["name"] and "tshark" in process.info["name"].lower():
+            return True
+    return False
+
+def wait_for_tshark_startup(timeout=20):
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        if is_tshark_running():
+            return True
+        time.sleep(0.5)
+    return False
+
 
 
 def load_rand_page():
@@ -147,7 +163,12 @@ def load_rand_page():
         # Run the tshark command in a separate thread  
         tshark_thread = threading.Thread(target=run_tshark, args=(pcap_name,))
         tshark_thread.start()
-    
+
+        # Wait for tshark to start (up to 20 seconds)
+        if not wait_for_tshark_startup():
+            print("Tshark failed to start within the timeout.")
+            sys.exit()
+
         
         # os.system(f'start "" C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\make_pcap.bat {pcap_name}')
         # Not required is capturing at router
