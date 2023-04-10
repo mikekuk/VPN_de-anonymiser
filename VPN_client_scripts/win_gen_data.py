@@ -134,7 +134,7 @@ def load_rand_page():
     len_sites = len(sites)
     addition = int(len_sites * (ow_ratio))
 
-    start_delay = random.randint(1,10) /10
+    start_delay = random.randint(1,3)
 
     if INCLUDE_OTHER_SITES:
         site_idx = random.randint(0,(len_sites + addition -1))
