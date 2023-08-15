@@ -25,7 +25,7 @@ For this to work as intended, the selenium drivers need to be installed. This ca
 
 The client will save all pcaps to the shared pcap_data directory.
 
-If required, extract_clips.py is used to exctact sessions and 20 second clips from larger pcaps. This is set to work with the ISCX VPN-No nVPN dateset.
+If required, extract_clips.py is used to extract sessions and 20 second clips from larger pcaps. This is set to work with the ISCX VPN-No nVPN dateset.
 
 extract_arrays.ipynb is used to extract and save numpy arrays of the correct shape for training the model.
 
