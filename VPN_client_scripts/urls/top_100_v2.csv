@@ -4,10 +4,10 @@
 3,baidu.com,0
 4,instagram.com,1
 110,avito.ru,1
-6,qq.com,1
+6,qq.com,0
 7,wikipedia.org,1
 8,bing.com,1
-9,bilibili.com,1
+9,bilibili.com,0
 10,amazon.com,1
 11,twitter.com,1
 12,zhihu.com,0
@@ -40,7 +40,7 @@
 41,jd.com,0
 42,canva.com,1
 43,hao123.com,0
-45,xhamster.com,1
+45,xhamster.com,0
 46,douban.com,0
 47,zoom.us,1
 48,alipay.com,0
@@ -49,7 +49,7 @@
 51,imdb.com,1
 52,pinterest.com,1
 53,sohu.com,0
-54,spankbang.com,1
+54,spankbang.com,0
 55,tmall.com,0
 56,mail.ru,1
 58,so.com,1
@@ -73,7 +73,7 @@
 80,cnblogs.com,0
 81,1688.com,0
 82,primevideo.com,1
-83,stripchat.com,1
+83,stripchat.com,0
 84,spotify.com,1
 85,booking.com,1
 86,freepik.com,1
@@ -89,7 +89,7 @@
 96,hbomax.com,1
 97,youku.com,1
 119,115.com,0
-99,ilovepdf.com,1
+99,ilovepdf.com,0
 100,chaturbate.com,0
 101,3dmgame.com,0
 103,amazonaws.com,0

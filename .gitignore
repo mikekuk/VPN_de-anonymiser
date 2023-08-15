@@ -15,3 +15,7 @@ terraform/
 Deep_Fingerprinting/data
 CUMUL/data
 encoders/
+Colab/
+Deep_Fingerprinting/dataset/
+Deep_Fingerprinting/src/
+models/

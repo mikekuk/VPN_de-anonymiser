@@ -81,6 +81,19 @@ except:
     pass
 
 
+# Disconnect VPN and start TOR for TOR clients
+
+if pet_tag == "tor":
+    time.sleep(10)
+    cmd = '"C:\\Program Files\\Private Internet Access\\piactl.exe" disconnect'
+    subprocess.run(cmd, shell=True)
+    time.sleep(20)
+    cmd = '"C:\\Users\\Administrator\\Desktop\\Tor Browser\\Browser\\firefox.exe"'
+    subprocess.run(cmd, shell=True)
+    time.sleep(20)
+
+
+
 # Update urls list
 
 def download_and_save(url, file_path):
@@ -92,14 +105,16 @@ def download_and_save(url, file_path):
     with open(file_path, "wb") as file:
         file.write(response.content)
 
-# Update csv list
 url = "https://raw.githubusercontent.com/mikekuk/VPN_de-anonymiser/main/VPN_client_scripts/urls/top_100_v2.csv"
 file_path = "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\urls\\top_100_v2.csv"
 download_and_save(url, file_path)
 
-# Update win_get_data
+
 url = "https://raw.githubusercontent.com/mikekuk/VPN_de-anonymiser/main/VPN_client_scripts/win_gen_data.py"
 file_path = "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\win_gen_data.py"
 download_and_save(url, file_path)
+
+
+time.sleep(10)
 
 subprocess.run(["python", "C:\\Users\\Administrator\\Documents\\GitHub\\VPN_de-anonymiser\\VPN_client_scripts\\collect.py"])
